@@ -39,11 +39,15 @@ RUN groupadd -g 1000 appgroup && \
 
 WORKDIR /app
 
+ENV PYTHONPATH="/app:$PYTHONPATH"
+
 # Install precompiled wheels from builder stage
 COPY --from=builder /build/wheels /tmp/wheels
 COPY --from=builder /build/dist /tmp/dist
 RUN pip install --no-cache-dir --no-index --find-links=/tmp/wheels /tmp/dist/*.whl \
     && rm -rf /tmp/wheels /tmp/dist
+
+COPY src/ /app/src/
 
 # Set ownership to unprivileged user
 RUN chown -R appuser:appgroup /app
